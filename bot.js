@@ -38,6 +38,11 @@ client.on('messageCreate', async (message) => {
         .setLabel('Apply')
         .setStyle(ButtonStyle.Primary);
 
+    const fastButton = new ButtonBuilder()
+        .setCustomId("fasttrack_button")
+        .setLabel("Fast Track - Partnered Company")
+        .setStyle(ButtonStyle.Premium)
+
     const row = new ActionRowBuilder().addComponents(applyButton);
 
     await channel.send({ embeds: [embed], components: [row] });
