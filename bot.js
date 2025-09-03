@@ -132,7 +132,7 @@ if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
 
         if (thumbnail) embed.setThumbnail(thumbnail);
 
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        await interaction.reply({ embeds: [embed], ephemeral: false });
 
     } catch (err) {
         console.error(err);
