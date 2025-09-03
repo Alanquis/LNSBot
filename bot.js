@@ -85,32 +85,49 @@ Complete the application below if you want to apply!`)
 // Handle interactions
 client.on('interactionCreate', async (interaction) => {
 
-    // /info command
-    if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
-        const targetUser = interaction.options.getUser('user') || interaction.user;
-        try {
-            const res = await pool.query(`SELECT westbridge_plate, roblox_username FROM users WHERE user_id = $1`, [targetUser.id]);
-            if (!res.rows.length) return interaction.reply({ content: 'No application data found for this user.', ephemeral: true });
+   // /info command
+if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
+    const targetUser = interaction.options.getUser('user') || interaction.user;
 
-            const { westbridge_plate, roblox_username } = res.rows[0];
-            const thumbnail = roblox_username ? await getRobloxThumbnail(roblox_username) : null;
+    try {
+        const res = await pool.query(
+            `SELECT westbridge_plate, roblox_username FROM users WHERE user_id = $1`,
+            [targetUser.id]
+        );
 
-            const embed = new EmbedBuilder()
-                .setTitle(`${targetUser.username}'s Info`)
-                .addFields(
-                    { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
-                    { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true }
-                )
-                .setColor('#FF69B4');
-            if (thumbnail) embed.setThumbnail(thumbnail);
-
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-        } catch (err) {
-            console.error(err);
-            await interaction.reply({ content: 'Error fetching user info.', ephemeral: true });
+        if (!res.rows.length) {
+            return interaction.reply({
+                content: 'No application data found for this user.',
+                ephemeral: true
+            });
         }
-        return;
+
+        const { westbridge_plate, roblox_username } = res.rows[0];
+
+        // Fetch Roblox thumbnail
+        let thumbnail = null;
+        if (roblox_username) {
+            thumbnail = await getRobloxThumbnail(roblox_username);
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${targetUser.username}'s Info`)
+            .addFields(
+                { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
+                { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true },
+                { name: 'Roblox Avatar URL', value: thumbnail || 'Not available', inline: false }
+            )
+            .setColor('#FF69B4');
+
+        if (thumbnail) embed.setThumbnail(thumbnail);
+
+        await interaction.reply({ embeds: [embed], ephemeral: true });
+
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({ content: 'Error fetching user info.', ephemeral: true });
     }
+}
 
     // /unlink command
    if (interaction.isChatInputCommand() && interaction.commandName === 'unlink') {
