@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Alanquis/LNSBot#readme",
   "dependencies": {
     "discord.js": "^14.22.1",
+    "node-fetch": "^3.3.2",
     "pg": "^8.16.3"
   }
 }
