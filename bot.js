@@ -19,8 +19,8 @@ client.on('messageCreate', async (message) => {
     if (!channel) return message.reply('Please mention a valid channel.');
 
     const embed = new EmbedBuilder()
-    .setTitle('Recruitment at London News Service Ltd!')
-    .setDescription(`Join our team of Community (Local News) Journalists here at London News Service!
+        .setTitle('Recruitment at London News Service Ltd!')
+        .setDescription(`Join our team of Community (Local News) Journalists here at London News Service!
 
         We have NO activity requirements, come on-duty as you wish.
         NO training required. Just read through our handbook and you will be set for an amazing career!
@@ -30,25 +30,31 @@ client.on('messageCreate', async (message) => {
         If you are employed in a Partnered Company, you are eligible for Direct Entry, so please press that button down below.
 
        Complete the application below if you want to apply!`)
-    .setColor('#FF69B4')
-    .setThumbnail('https://cdn.discordapp.com/attachments/1410978378583900230/1410988091338133745/lns_emb.png?ex=68b99c0f&is=68b84a8f&hm=b6d6b1adb21259fbce408d0658f8d4938e45e3c770218b1157057169123dcb32&'); // Replace with your thumbnail URL
+        .setColor('#FF69B4')
+        .setThumbnail('https://cdn.discordapp.com/attachments/1410978378583900230/1410988091338133745/lns_emb.png?ex=68b99c0f&is=68b84a8f&hm=b6d6b1adb21259fbce408d0658f8d4938e45e3c770218b1157057169123dcb32&'); // Replace with your thumbnail URL
 
-const applyButton = new ButtonBuilder()
-    .setCustomId('apply_button')
-    .setLabel('Apply')
-    .setStyle(ButtonStyle.Primary);
+    const applyButton = new ButtonBuilder()
+        .setCustomId('apply_button')
+        .setLabel('Apply')
+        .setStyle(ButtonStyle.Primary);
 
-const row = new ActionRowBuilder().addComponents(applyButton);
+    const row = new ActionRowBuilder().addComponents(applyButton);
 
-await channel.send({ embeds: [embed], components: [row] });
-
+    await channel.send({ embeds: [embed], components: [row] });
 });
 
-// Handle button click
+// Store users who have applied
+const appliedUsers = new Set();
+
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'apply_button') {
+        if (appliedUsers.has(interaction.user.id)) {
+            await interaction.reply({ content: 'You have already applied!', ephemeral: true });
+            return;
+        }
+
         const modal = new ModalBuilder()
             .setCustomId('application_modal')
             .setTitle('LNS Application');
@@ -94,21 +100,18 @@ client.on('interactionCreate', async (interaction) => {
         const user = await client.users.fetch(userId);
 
         if (action === 'approve') {
-             const [action, userId] = interaction.customId.split('_');
-    const user = await client.users.fetch(userId);
-    const guild = interaction.guild; // Make sure you are in a guild context
-    const member = await guild.members.fetch(userId);
-    
-                      // Assign the role
-                      const role = guild.roles.cache.find(r => r.id === '1412827458473951372'); // Replace with your role name
-                    if (role) await member.roles.add(role);
+            const guild = interaction.guild; // Make sure you are in a guild context
+            const member = await guild.members.fetch(userId);
 
-                    await user.send({
-                          embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: [Your Link]').setColor('Green')]
-                     });
+            // Assign the role
+            const role = guild.roles.cache.find(r => r.id === '1412827458473951372'); // Replace with your role ID
+            if (role) await member.roles.add(role);
 
-                    await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
-            }
+            await user.send({
+                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: [Your Link]').setColor('Green')]
+            });
+
+            await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
         } else if (action === 'decline') {
             const reason = 'Your application did not meet our requirements.'; // optional: you can make staff enter reason via modal
             await user.send({
@@ -116,8 +119,8 @@ client.on('interactionCreate', async (interaction) => {
             });
             await interaction.update({ content: `Application declined for <@${userId}>`, components: [] });
         }
-    },
-);
+    }
+});
 
 // Handle modal submit
 client.on('interactionCreate', async (interaction) => {
@@ -128,6 +131,9 @@ client.on('interactionCreate', async (interaction) => {
     const q2 = interaction.fields.getTextInputValue('question2');
     const q3 = interaction.fields.getTextInputValue('question3');
     const q4 = interaction.fields.getTextInputValue('question4');
+
+    // Mark user as applied
+    appliedUsers.add(interaction.user.id);
 
     const staffChannel = await client.channels.fetch(STAFF_CHANNEL_ID);
 
