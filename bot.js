@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, Partials, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] });
 
-const TOKEN = TOKEN.env;
+const TOKEN = process.env.TOKEN;
 const STAFF_CHANNEL_ID = '1412816870087721041'; // replace with your staff-app channel ID
 
 client.once('ready', () => {
