@@ -23,7 +23,7 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
 
     // Register /info command
-    const guild = client.guilds.cache.get('YOUR_GUILD_ID'); // Replace with your server ID
+    const guild = client.guilds.cache.get("1333184657059221644"); // Replace with your server ID
     await guild.commands.create({
         name: 'info',
         description: 'Show your Westbridge Plate and Roblox Username from your application'
