@@ -36,12 +36,12 @@ client.on('messageCreate', async (message) => {
     const applyButton = new ButtonBuilder()
         .setCustomId('apply_button')
         .setLabel('Apply')
-        .setStyle(ButtonStyle.Primary);
+        .setStyle(ButtonStyle.Success);
 
     const fastButton = new ButtonBuilder()
         .setCustomId("fasttrack_button")
         .setLabel("Fast Track - Partnered Company")
-        .setStyle(ButtonStyle.Premium)
+        .setStyle(ButtonStyle.Danger)
 
     const row = new ActionRowBuilder().addComponents(applyButton, fastButton);
 
