@@ -22,13 +22,24 @@ const appliedUsers = new Set();
 // Helper to fetch Roblox thumbnail
 async function getRobloxThumbnail(username) {
     try {
-        const userRes = await fetch(`https://users.roblox.com/v1/users/by-username?username=${encodeURIComponent(username)}`);
+        // Step 1: Get userId from username
+        const userRes = await fetch(`https://api.roproxy.com/users/get-by-username?username=${encodeURIComponent(username)}`);
         const userData = await userRes.json();
-        if (!userData.id) return null;
+        if (!userData.Id) {
+            console.error(`User not found: ${username}`);
+            return null;
+        }
 
-        const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userData.id}&size=150x150&format=Png&isCircular=true`);
+        const userId = userData.Id;
+
+        // Step 2: Get headshot thumbnail
+        const thumbRes = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`);
         const thumbData = await thumbRes.json();
-        if (thumbData?.data?.[0]?.imageUrl) return thumbData.data[0].imageUrl;
+
+        if (thumbData?.data?.[0]?.imageUrl) {
+            console.log(`Fetched thumbnail for ${username}: ${thumbData.data[0].imageUrl}`);
+            return thumbData.data[0].imageUrl;
+        }
 
         return null;
     } catch (err) {
