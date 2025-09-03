@@ -30,7 +30,7 @@ client.on('messageCreate', async (message) => {
         If you are employed in a Partnered Company, you are eligible for Direct Entry, so please press that button down below.
 
         Open a ticket below if you want to apply or find out more!`)
-    .setColor('Pink')
+    .setColor('#FF69B4')
     .setThumbnail('https://cdn.discordapp.com/attachments/1410978378583900230/1410988091338133745/lns_emb.png?ex=68b99c0f&is=68b84a8f&hm=b6d6b1adb21259fbce408d0658f8d4938e45e3c770218b1157057169123dcb32&'); // Replace with your thumbnail URL
 
 const applyButton = new ButtonBuilder()
