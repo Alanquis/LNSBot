@@ -7,6 +7,8 @@ const client = new Client({
     partials: [Partials.Channel] 
 });
 
+
+
 const TOKEN = process.env.TOKEN;
 const STAFF_CHANNEL_ID = '1412816870087721041'; // Staff application channel
 
@@ -16,6 +18,41 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+async function createTables() {
+    try {
+        // Create users table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                user_id BIGINT PRIMARY KEY,
+                westbridge_plate TEXT NOT NULL,
+                roblox_username TEXT NOT NULL,
+                submitted_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        // Create applications table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS applications (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                question1 TEXT,
+                question2 TEXT,
+                question3 TEXT,
+                question4 TEXT,
+                is_fast_track BOOLEAN DEFAULT FALSE,
+                submitted_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        console.log('Tables created successfully!');
+        process.exit(0);
+    } catch (err) {
+        console.error('Error creating tables:', err);
+        process.exit(1);
+    }
+}
+
+createTables();
 // Store users who have applied
 const appliedUsers = new Set();
 
