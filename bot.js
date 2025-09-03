@@ -43,7 +43,7 @@ client.on('messageCreate', async (message) => {
         .setLabel("Fast Track - Partnered Company")
         .setStyle(ButtonStyle.Premium)
 
-    const row = new ActionRowBuilder().addComponents(applyButton);
+    const row = new ActionRowBuilder().addComponents(applyButton, fastButton);
 
     await channel.send({ embeds: [embed], components: [row] });
 });
@@ -113,7 +113,7 @@ client.on('interactionCreate', async (interaction) => {
             if (role) await member.roles.add(role);
 
             await user.send({
-                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: [Your Link]').setColor('Green')]
+                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\n\nHere is the group link, Please request and we will accept you as soon as possible: [https://www.roblox.com/communities/17125518/London-News-Service-Ltd#!/about]\n\n Please read the staff handbook: [https://docs.google.com/presentation/d/1ogPjPoMWUOJKaEULD5VFDszK2U6EL3Y7uiYW0CR3_6Q/edit?usp=sharing]').setColor('Green')]
             });
 
             await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
