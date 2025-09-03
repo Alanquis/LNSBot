@@ -27,9 +27,17 @@ client.once('ready', async () => {
 
     // Register /info command
     const guild = client.guilds.cache.get("1333184657059221644"); // Replace with your server ID
-    await guild.commands.create({
-        name: 'info',
-        description: 'Show your Westbridge Plate and Roblox Username from your application'
+   await guild.commands.create({
+    name: 'info',
+    description: 'Show a user\'s Westbridge Plate and Roblox Username from their application',
+    options: [
+        {
+            name: 'user',
+            description: 'The Discord user to view info for',
+            type: 6, // USER type
+            required: false
+        }
+    ]
     });
 });
 
@@ -39,9 +47,14 @@ async function getRobloxThumbnail(username) {
         const res = await fetch(`https://api.roblox.com/users/get-by-username?username=${username}`);
         const data = await res.json();
         if (!data.Id) return null;
-        const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${data.Id}&size=150x150&format=Png&isCircular=true`);
+        const userId = data.Id;
+
+        const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=150x150&format=Png&isCircular=true`);
         const thumbData = await thumbRes.json();
-        return thumbData.data[0].imageUrl;
+        if (thumbData && thumbData.data && thumbData.data[0] && thumbData.data[0].imageUrl) {
+            return thumbData.data[0].imageUrl;
+        }
+        return null;
     } catch (err) {
         console.error('Error fetching Roblox thumbnail:', err);
         return null;
@@ -90,39 +103,61 @@ Complete the application below if you want to apply!`)
 client.on('interactionCreate', async (interaction) => {
 
     // /info command
-    if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
-        try {
-            const res = await pool.query(
-                `SELECT westbridge_plate, roblox_username FROM users WHERE user_id = $1`,
-                [interaction.user.id]
-            );
+     if (!interaction.isChatInputCommand()) return;
+    if (interaction.commandName !== 'info') return;
 
-            if (res.rows.length === 0) {
-                await interaction.reply({ content: 'No application data found. Please submit an application first.', ephemeral: true });
-                return;
-            }
+    // Get target user, default to the command user
+    const targetUser = interaction.options.getUser('user') || interaction.user;
 
-            const { westbridge_plate, roblox_username } = res.rows[0];
+    try {
+        const res = await pool.query(
+            `SELECT westbridge_plate, roblox_username FROM users WHERE user_id = $1`,
+            [targetUser.id]
+        );
 
+        if (res.rows.length === 0) {
             await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle(`${interaction.user.username}'s Info`)
-                        .addFields(
-                            { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
-                            { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true }
-                        )
-                        .setColor('#FF69B4')
-                ],
+                content: 'No application data found for this user.',
                 ephemeral: true
             });
-
-        } catch (err) {
-            console.error(err);
-            await interaction.reply({ content: 'Error fetching your info.', ephemeral: true });
+            return;
         }
-        return;
+
+        const { westbridge_plate, roblox_username } = res.rows[0];
+
+        // Fetch Roblox thumbnail
+        let thumbnail = null;
+        if (roblox_username) {
+            try {
+                const userRes = await fetch(`https://api.roblox.com/users/get-by-username?username=${encodeURIComponent(roblox_username)}`);
+                const userData = await userRes.json();
+                if (userData.Id) {
+                    const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userData.Id}&size=150x150&format=Png&isCircular=true`);
+                    const thumbData = await thumbRes.json();
+                    if (thumbData?.data?.[0]?.imageUrl) thumbnail = thumbData.data[0].imageUrl;
+                }
+            } catch (err) {
+                console.error('Error fetching Roblox thumbnail:', err);
+            }
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${targetUser.username}'s Info`)
+            .addFields(
+                { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
+                { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true }
+            )
+            .setColor('#FF69B4');
+
+        if (thumbnail) embed.setThumbnail(thumbnail);
+
+        await interaction.reply({ embeds: [embed], ephemeral: true });
+
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({ content: 'Error fetching user info.', ephemeral: true });
     }
+
 
     if (!interaction.isButton()) return;
 
