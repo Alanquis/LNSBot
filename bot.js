@@ -94,10 +94,21 @@ client.on('interactionCreate', async (interaction) => {
         const user = await client.users.fetch(userId);
 
         if (action === 'approve') {
-            await user.send({
-                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: https://www.roblox.com/communities/17125518/London-News-Service-Ltd#!/about\n Please send a request to the group and read the staff handbook! \n Staff Handbook:https://docs.google.com/presentation/d/1ogPjPoMWUOJKaEULD5VFDszK2U6EL3Y7uiYW0CR3_6Q/edit?usp=sharing').setColor('Green')]
-            });
-            await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
+             const [action, userId] = interaction.customId.split('_');
+    const user = await client.users.fetch(userId);
+    const guild = interaction.guild; // Make sure you are in a guild context
+    const member = await guild.members.fetch(userId);
+    
+                      // Assign the role
+                      const role = guild.roles.cache.find(r => r.id === '1412827458473951372'); // Replace with your role name
+                    if (role) await member.roles.add(role);
+
+                    await user.send({
+                          embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: [Your Link]').setColor('Green')]
+                     });
+
+                    await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
+            }
         } else if (action === 'decline') {
             const reason = 'Your application did not meet our requirements.'; // optional: you can make staff enter reason via modal
             await user.send({
@@ -105,8 +116,8 @@ client.on('interactionCreate', async (interaction) => {
             });
             await interaction.update({ content: `Application declined for <@${userId}>`, components: [] });
         }
-    }
-});
+    },
+);
 
 // Handle modal submit
 client.on('interactionCreate', async (interaction) => {
