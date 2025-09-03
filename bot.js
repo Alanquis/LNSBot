@@ -21,6 +21,7 @@ const appliedUsers = new Set();
 
 // Helper to fetch Roblox thumbnail
 async function getRobloxThumbnail(username) {
+    console.log("USING ROPROXY");
     try {
         // Step 1: Get userId from username
         const userRes = await fetch(`https://api.roproxy.com/users/get-by-username?username=${encodeURIComponent(username)}`);
