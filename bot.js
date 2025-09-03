@@ -1,8 +1,8 @@
 const { Client, GatewayIntentBits, Partials, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] });
 
-const TOKEN = 'YOUR_BOT_TOKEN';
-const STAFF_CHANNEL_ID = 'STAFF_CHANNEL_ID'; // replace with your staff-app channel ID
+const TOKEN = TOKEN.env;
+const STAFF_CHANNEL_ID = '1412816870087721041'; // replace with your staff-app channel ID
 
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
