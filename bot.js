@@ -53,6 +53,40 @@ async function getRobloxThumbnail(username) {
     }
 }
 
+async function getRobloxGroupRole(username, groupId) {
+    try {
+        // Step 1: Get userId from username
+        const userRes = await fetch("https://users.roproxy.com/v1/usernames/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ usernames: [username] })
+        });
+        const userData = await userRes.json();
+        const userId = userData?.data?.[0]?.id;
+        if (!userId) {
+            console.error(`User not found: ${username}`);
+            return null;
+        }
+
+        // Step 2: Get group membership
+        const groupRes = await fetch(`https://groups.roproxy.com/v1/users/${userId}/groups/roles`);
+        const groupData = await groupRes.json();
+        if (!groupData?.data) return null;
+
+        const membership = groupData.data.find(m => m.group.id === groupId);
+        if (!membership) return null;
+
+        return {
+            roleName: membership.role.name,
+            roleRank: membership.role.rank
+        };
+
+    } catch (err) {
+        console.error("Error fetching Roblox group role:", err);
+        return null;
+    }
+}
+
 
 
 client.once('ready', async () => {
@@ -121,7 +155,10 @@ if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
         }
 
         const { westbridge_plate, roblox_username } = res.rows[0];
-
+       let groupRole = null;
+        if (roblox_username) {
+         groupRole = await getRobloxGroupRole(roblox_username, 17125518);
+        }
         // Fetch Roblox thumbnail
         let thumbnail = null;
         if (roblox_username) {
@@ -133,7 +170,8 @@ if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
             .addFields(
                 { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
                 { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true },
-                { name: 'Roblox Avatar URL', value: thumbnail || 'Not available', inline: false }
+                { name: 'Group Role', value: groupRole ? `${groupRole.roleName}` : 'Not in group', inline: true }
+                
             )
             .setColor('#FF69B4');
 
