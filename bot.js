@@ -168,9 +168,9 @@ if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
         const embed = new EmbedBuilder()
             .setTitle(`${targetUser.username}'s Info`)
             .addFields(
-                { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: true },
-                { name: 'Roblox Username', value: roblox_username || 'Not set', inline: true },
-                { name: 'Group Role', value: groupRole ? `${groupRole.roleName}` : 'Not in group', inline: true }
+                { name: 'Westbridge Plate', value: westbridge_plate || 'Not set', inline: false },
+                { name: 'Roblox Username', value: roblox_username || 'Not set', inline: false },
+                { name: 'Group Role', value: groupRole ? `${groupRole.roleName}` : 'Not in group', inline: false }
                 
             )
             .setColor('#FF69B4');
