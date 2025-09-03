@@ -95,7 +95,7 @@ client.on('interactionCreate', async (interaction) => {
 
         if (action === 'approve') {
             await user.send({
-                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: https://www.roblox.com/communities/17125518/London-News-Service-Ltd#!/about\n Please send a request to the group and read the staff documents!').setColor('Green')]
+                embeds: [new EmbedBuilder().setTitle('Application Approved').setDescription('Congratulations! Your application has been approved.\nHere is the group link: https://www.roblox.com/communities/17125518/London-News-Service-Ltd#!/about\n Please send a request to the group and read the staff handbook! \n Staff Handbook:https://docs.google.com/presentation/d/1ogPjPoMWUOJKaEULD5VFDszK2U6EL3Y7uiYW0CR3_6Q/edit?usp=sharing').setColor('Green')]
             });
             await interaction.update({ content: `Application approved for <@${userId}>`, components: [] });
         } else if (action === 'decline') {
