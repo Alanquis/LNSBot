@@ -19,18 +19,29 @@ client.on('messageCreate', async (message) => {
     if (!channel) return message.reply('Please mention a valid channel.');
 
     const embed = new EmbedBuilder()
-        .setTitle('Application')
-        .setDescription('Click the button below to start your application!')
-        .setColor('Blue');
+    .setTitle('Recruitment at London News Service Ltd!')
+    .setDescription(`Join our team of Community (Local News) Journalists here at London News Service!
 
-    const button = new ButtonBuilder()
-        .setCustomId('apply_button')
-        .setLabel('Apply')
-        .setStyle(ButtonStyle.Primary);
+        We have NO activity requirements, come on-duty as you wish.
+        NO training required. Just read through our handbook and you will be set for an amazing career!
+        NO off-duty crime restrictions! We do not limit you on what you can do off-duty!
+        Employee of the Week and Month awards inside of your departments.
 
-    const row = new ActionRowBuilder().addComponents(button);
+        If you are employed in a Partnered Company, you are eligible for Direct Entry, so please press that button down below.
 
-    await channel.send({ embeds: [embed], components: [row] });
+        Open a ticket below if you want to apply or find out more!`)
+    .setColor('Pink')
+    .setThumbnail('https://cdn.discordapp.com/attachments/1410978378583900230/1410988091338133745/lns_emb.png?ex=68b99c0f&is=68b84a8f&hm=b6d6b1adb21259fbce408d0658f8d4938e45e3c770218b1157057169123dcb32&'); // Replace with your thumbnail URL
+
+const applyButton = new ButtonBuilder()
+    .setCustomId('apply_button')
+    .setLabel('Apply')
+    .setStyle(ButtonStyle.Primary);
+
+const row = new ActionRowBuilder().addComponents(applyButton);
+
+await channel.send({ embeds: [embed], components: [row] });
+
 });
 
 // Handle button click
@@ -40,12 +51,12 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.customId === 'apply_button') {
         const modal = new ModalBuilder()
             .setCustomId('application_modal')
-            .setTitle('Application Form');
+            .setTitle('LNS Application');
 
         // 4 questions
         const q1 = new TextInputBuilder()
             .setCustomId('question1')
-            .setLabel('Question 1')
+            .setLabel('What is your Westbridge Number Plate')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
