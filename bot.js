@@ -130,31 +130,30 @@ if (interaction.isChatInputCommand() && interaction.commandName === 'info') {
 }
 
     // /unlink command
-   if (interaction.isChatInputCommand() && interaction.commandName === 'unlink') {
-    // Optional target user
-    const targetUser = interaction.options?.getUser('user') || interaction.user;
-    const member = interaction.member;
 
-    // Role required to unlink others
-    const staffRoleId = '1412844338328899766'; // Replace with your staff/admin role ID
-    const isStaff = member.roles.cache.has(staffRoleId);
+    if (interaction.commandName === 'unlink') {
+        const modRoleId = '1412844338328899766'; // Replace with your mod role ID
+        const member = interaction.member;
+        const targetUser = interaction.options.getUser('user') || interaction.user;
 
-    // If trying to unlink someone else without the role, deny
-    if (targetUser.id !== interaction.user.id && !isStaff) {
-        return interaction.reply({ content: 'You do not have permission to unlink other users.', ephemeral: true });
-    }
-
-    try {
-        const res = await pool.query(`DELETE FROM users WHERE user_id = $1`, [targetUser.id]);
-        if (res.rowCount === 0) {
-            return interaction.reply({ content: 'No application data found for this user.', ephemeral: true });
+        // Check if the user is a mod
+        if (!member.roles.cache.has(modRoleId)) {
+            return interaction.reply({ content: 'Only moderators can use this command.', ephemeral: true });
         }
-        await interaction.reply({ content: `Application data for ${targetUser.username} has been removed.`, ephemeral: true });
-    } catch (err) {
-        console.error(err);
-        await interaction.reply({ content: 'Error removing data.', ephemeral: true });
+
+        try {
+            const res = await pool.query(`DELETE FROM users WHERE user_id = $1`, [targetUser.id]);
+
+            if (res.rowCount === 0) {
+                return interaction.reply({ content: 'No application data found for this user.', ephemeral: true });
+            }
+
+            await interaction.reply({ content: `Application data for ${targetUser.username} has been removed.`, ephemeral: true });
+        } catch (err) {
+            console.error(err);
+            await interaction.reply({ content: 'Error removing application data.', ephemeral: true });
+        }
     }
-}
 
     // Buttons: apply and fast track
     if (!interaction.isButton()) return;
